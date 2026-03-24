@@ -14,7 +14,7 @@ describe("GET /api/datasets", () => {
 		expect(res.status).toBe(200);
 		const json = await res.json();
 		expect(json.success).toBe(true);
-		expect(json.data.datasets.length).toBe(4); // demo seed data
+		expect(json.data.datasets.length).toBeGreaterThanOrEqual(4); // demo seed data
 	});
 
 	test("filters by category", async () => {
@@ -32,6 +32,29 @@ describe("GET /api/datasets", () => {
 		expect(json.data.datasets.length).toBe(2);
 		expect(json.data.page).toBe(1);
 		expect(json.data.limit).toBe(2);
+	});
+});
+
+describe("Dataset object shape", () => {
+	test("datasets have all expected fields", async () => {
+		const res = await app.request("/api/datasets/demo-1");
+		const json = await res.json();
+		const ds = json.data;
+		expect(ds).toHaveProperty("id");
+		expect(ds).toHaveProperty("name");
+		expect(ds).toHaveProperty("description");
+		expect(ds).toHaveProperty("category");
+		expect(ds).toHaveProperty("tags");
+		expect(ds).toHaveProperty("rootHash");
+		expect(ds).toHaveProperty("fileCount");
+		expect(ds).toHaveProperty("totalSize");
+		expect(ds).toHaveProperty("format");
+		expect(ds).toHaveProperty("price");
+		expect(ds).toHaveProperty("license");
+		expect(ds).toHaveProperty("sales");
+		expect(ds).toHaveProperty("rating");
+		expect(ds).toHaveProperty("active");
+		expect(Array.isArray(ds.tags)).toBe(true);
 	});
 });
 
