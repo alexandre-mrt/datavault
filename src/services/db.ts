@@ -1,9 +1,9 @@
 import { Database } from "bun:sqlite";
 
-export const db = new Database("./data/datavault.db", { create: true });
+export const db = new Database(process.env.DATABASE_URL || "./data/datavault.db", { create: true });
 db.exec("PRAGMA journal_mode = WAL");
 
-export function initializeDatabase() {
+function createTables() {
 	db.exec(`
     CREATE TABLE IF NOT EXISTS datasets (
       id TEXT PRIMARY KEY,
@@ -55,6 +55,13 @@ export function initializeDatabase() {
       ('demo-3', '0xDemo3', 'Multilingual NLP Training Corpus', 'Curated text dataset in 50 languages for training language models. Cleaned and deduplicated.', 'nlp', '["nlp","text","multilingual","training"]', '0xdemo_hash_3', 200, 53687091200, 'jsonl', '50', 'open', 89, 4.2),
       ('demo-4', '0xDemo4', 'DeFi Protocol Analytics', 'TVL, yields, and risk metrics for 500+ DeFi protocols across 20 chains. Updated daily.', 'finance', '["defi","analytics","yields","risk"]', '0xdemo_hash_4', 20, 1073741824, 'json', '10', 'commercial', 156, 4.7);
   `);
+}
+
+// Auto-init tables before prepared statements
+createTables();
+
+export function initializeDatabase() {
+	createTables();
 }
 
 export interface DatasetRow {
