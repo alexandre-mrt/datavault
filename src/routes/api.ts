@@ -18,6 +18,11 @@ apiRouter.get("/datasets", (c) => {
 	return c.json({ success: true, data: { datasets: datasets.map(formatDataset), page, limit } });
 });
 
+apiRouter.get("/datasets/count", (c) => {
+	const active = queries.countActive.get();
+	return c.json({ success: true, data: { count: active?.count ?? 0 } });
+});
+
 apiRouter.get("/datasets/search", (c) => {
 	const q = (c.req.query("q") || "").trim().slice(0, 200);
 	if (q.length === 0) {
