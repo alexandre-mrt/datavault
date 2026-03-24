@@ -236,3 +236,41 @@ describe("Create and retrieve round-trip", () => {
 		expect(found).toBeTruthy();
 	});
 });
+
+describe("Error response format", () => {
+	test("404 returns success:false with error message", async () => {
+		const res = await app.request("/api/datasets/nonexistent");
+		expect(res.status).toBe(404);
+		const json = await res.json();
+		expect(json.success).toBe(false);
+		expect(json).toHaveProperty("error");
+	});
+
+	test("400 returns descriptive error", async () => {
+		const res = await app.request("/api/datasets", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({}),
+		});
+		const json = await res.json();
+		expect(json.success).toBe(false);
+		expect(json.error.length).toBeGreaterThan(5);
+	});
+});
+
+describe("Demo data integrity", () => {
+	test("demo datasets have valid ratings", async () => {
+		const res = await app.request("/api/datasets");
+		const json = await res.json();
+		for (const ds of json.data.datasets) {
+			expect(ds.rating).toBeGreaterThanOrEqual(0);
+			expect(ds.rating).toBeLessThanOrEqual(5);
+		}
+	});
+
+	test("demo datasets have positive sales", async () => {
+		const res = await app.request("/api/datasets/demo-1");
+		const json = await res.json();
+		expect(json.data.sales).toBeGreaterThan(0);
+	});
+});
