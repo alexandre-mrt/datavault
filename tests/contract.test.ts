@@ -1,0 +1,42 @@
+import { describe, expect, test } from "bun:test";
+
+describe("DataMarketplace contract constants", () => {
+	const FEE_BPS = 500;
+	const BPS = 10000;
+
+	test("fee is exactly 5%", () => {
+		const feePercent = (FEE_BPS / BPS) * 100;
+		expect(feePercent).toBe(5);
+	});
+
+	test("subscription pricing (30 days)", () => {
+		const THIRTY_DAYS_SECONDS = 30 * 24 * 60 * 60;
+		expect(THIRTY_DAYS_SECONDS).toBe(2592000);
+	});
+
+	test("fee calculation for various dataset prices", () => {
+		const prices = [
+			{ price: 10n, expectedFee: 0n }, // 5% of 10 = 0.5, rounds to 0
+			{ price: 20n, expectedFee: 1n },
+			{ price: 100n, expectedFee: 5n },
+			{ price: 1000n, expectedFee: 50n },
+		];
+
+		for (const { price, expectedFee } of prices) {
+			const fee = (price * BigInt(FEE_BPS)) / BigInt(BPS);
+			expect(fee).toBe(expectedFee);
+		}
+	});
+
+	test("valid dataset formats", () => {
+		const formats = ["csv", "json", "jsonl", "parquet", "images", "text", "audio", "video"];
+		expect(formats.length).toBe(8);
+	});
+
+	test("valid license types", () => {
+		const licenses = ["commercial", "research", "open"];
+		for (const l of licenses) {
+			expect(l.length).toBeGreaterThan(0);
+		}
+	});
+});
