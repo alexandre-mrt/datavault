@@ -1,5 +1,8 @@
 # DataVault
 
+[![CI](https://github.com/alexandre-mrt/datavault/actions/workflows/ci.yml/badge.svg)](https://github.com/alexandre-mrt/datavault/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **Decentralized Data Marketplace on 0G Storage.**
 
 Buy and sell datasets for AI training, analytics, and research. Data is stored on [0G decentralized storage](https://0g.ai), ensuring availability, integrity, and censorship resistance.
