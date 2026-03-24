@@ -188,4 +188,51 @@ describe("GET /api/stats", () => {
 		expect(json.data.totalDatasets).toBeGreaterThan(0);
 		expect(json.data.totalSales).toBeGreaterThan(0);
 	});
+
+	test("stats counts are consistent", async () => {
+		const res = await app.request("/api/stats");
+		const json = await res.json();
+		expect(json.data.activeDatasets).toBeLessThanOrEqual(json.data.totalDatasets);
+	});
+});
+
+describe("Create and retrieve round-trip", () => {
+	test("created dataset is retrievable by ID", async () => {
+		const createRes = await app.request("/api/datasets", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				seller: "0xroundtrip",
+				name: "Round Trip Dataset",
+				description: "Testing create + get",
+				category: "nlp",
+				tags: ["round", "trip"],
+				rootHash: "0xroundtriphash",
+				format: "jsonl",
+				price: "15",
+				license: "open",
+			}),
+		});
+		const created = await createRes.json();
+		const id = created.data.id;
+
+		const getRes = await app.request(`/api/datasets/${id}`);
+		expect(getRes.status).toBe(200);
+		const ds = (await getRes.json()).data;
+		expect(ds.name).toBe("Round Trip Dataset");
+		expect(ds.category).toBe("nlp");
+		expect(ds.tags).toEqual(["round", "trip"]);
+		expect(ds.format).toBe("jsonl");
+		expect(ds.price).toBe("15");
+		expect(ds.license).toBe("open");
+		expect(ds.active).toBe(true);
+	});
+
+	test("created dataset appears in search", async () => {
+		const res = await app.request("/api/datasets/search?q=Round+Trip");
+		const json = await res.json();
+		expect(json.data.datasets.length).toBeGreaterThanOrEqual(1);
+		const found = json.data.datasets.find((d: { name: string }) => d.name === "Round Trip Dataset");
+		expect(found).toBeTruthy();
+	});
 });
