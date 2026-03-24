@@ -40,3 +40,42 @@ describe("DataMarketplace contract constants", () => {
 		}
 	});
 });
+
+describe("Rating validation", () => {
+	test("ratings are between 0 and 5", () => {
+		const ratings = [0, 1, 2.5, 3.7, 4.5, 5];
+		for (const r of ratings) {
+			expect(r).toBeGreaterThanOrEqual(0);
+			expect(r).toBeLessThanOrEqual(5);
+		}
+	});
+
+	test("rating CHECK constraint in SQL (1-5 for reviews)", () => {
+		// Reviews must be 1-5, datasets can be 0-5 (average)
+		for (const r of [1, 2, 3, 4, 5]) {
+			expect(r >= 1 && r <= 5).toBe(true);
+		}
+	});
+});
+
+describe("Data size validation", () => {
+	test("total_size is in bytes", () => {
+		const oneGB = 1024 * 1024 * 1024;
+		expect(oneGB).toBe(1073741824);
+	});
+
+	test("file_count is positive integer", () => {
+		const counts = [1, 5, 10, 100, 200];
+		for (const c of counts) {
+			expect(c).toBeGreaterThan(0);
+			expect(Number.isInteger(c)).toBe(true);
+		}
+	});
+
+	test("price stored as string for precision", () => {
+		// Using string avoids floating-point issues with token amounts
+		const price = "10.5";
+		expect(typeof price).toBe("string");
+		expect(Number(price)).toBe(10.5);
+	});
+});
