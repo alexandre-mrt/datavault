@@ -26,6 +26,23 @@ describe("GET /api/datasets", () => {
 		}
 	});
 
+	test("blockchain category only returns blockchain datasets", async () => {
+		const res = await app.request("/api/datasets?category=blockchain");
+		const json = await res.json();
+		for (const ds of json.data.datasets) {
+			expect(ds.category).toBe("blockchain");
+		}
+	});
+
+	test("returns datasets sorted by sales (popularity)", async () => {
+		const res = await app.request("/api/datasets");
+		const json = await res.json();
+		const datasets = json.data.datasets;
+		for (let i = 0; i < datasets.length - 1; i++) {
+			expect(datasets[i].sales).toBeGreaterThanOrEqual(datasets[i + 1].sales);
+		}
+	});
+
 	test("paginates correctly", async () => {
 		const res = await app.request("/api/datasets?page=1&limit=2");
 		const json = await res.json();
