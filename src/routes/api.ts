@@ -19,8 +19,11 @@ apiRouter.get("/datasets", (c) => {
 });
 
 apiRouter.get("/datasets/search", (c) => {
-	const q = c.req.query("q") || "";
-	const page = Number(c.req.query("page") || "1");
+	const q = (c.req.query("q") || "").trim().slice(0, 200);
+	if (q.length === 0) {
+		return c.json({ success: true, data: { datasets: [], query: "" } });
+	}
+	const page = Math.max(1, Number(c.req.query("page") || "1") || 1);
 	const limit = 20;
 	const offset = (page - 1) * limit;
 	const pattern = `%${q}%`;
