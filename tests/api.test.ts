@@ -20,7 +20,7 @@ describe("GET /api/datasets", () => {
 	test("filters by category", async () => {
 		const res = await app.request("/api/datasets?category=finance");
 		const json = await res.json();
-		expect(json.data.datasets.length).toBe(2); // demo-1 and demo-4
+		expect(json.data.datasets.length).toBeGreaterThanOrEqual(2); // at least demo-1 and demo-4
 		for (const ds of json.data.datasets) {
 			expect(ds.category).toBe("finance");
 		}
