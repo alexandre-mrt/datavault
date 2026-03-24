@@ -53,7 +53,24 @@ apiRouter.post("/datasets", async (c) => {
 	}>();
 
 	if (!body.name || !body.seller || !body.rootHash || !body.price) {
-		return c.json({ success: false, error: "Missing required fields" }, 400);
+		return c.json({ success: false, error: "Missing required fields: name, seller, rootHash, price" }, 400);
+	}
+
+	if (body.name.trim().length === 0 || body.name.length > 300) {
+		return c.json({ success: false, error: "Name must be 1-300 characters" }, 400);
+	}
+
+	if (Number.isNaN(Number(body.price)) || Number(body.price) <= 0) {
+		return c.json({ success: false, error: "Price must be a positive number" }, 400);
+	}
+
+	if (!body.seller.startsWith("0x")) {
+		return c.json({ success: false, error: "Seller must be a valid address (0x...)" }, 400);
+	}
+
+	const validFormats = ["csv", "json", "jsonl", "parquet", "images", "text", "audio", "video"];
+	if (body.format && !validFormats.includes(body.format)) {
+		return c.json({ success: false, error: `Invalid format. Must be one of: ${validFormats.join(", ")}` }, 400);
 	}
 
 	const id = nanoid();

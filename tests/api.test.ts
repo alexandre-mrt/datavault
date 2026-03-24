@@ -85,6 +85,55 @@ describe("POST /api/datasets", () => {
 		});
 		expect(res.status).toBe(400);
 	});
+
+	test("rejects invalid price", async () => {
+		const res = await app.request("/api/datasets", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				seller: "0xseller",
+				name: "Test",
+				rootHash: "0xhash",
+				price: "free",
+			}),
+		});
+		expect(res.status).toBe(400);
+		const json = await res.json();
+		expect(json.error).toContain("Price");
+	});
+
+	test("rejects invalid seller address", async () => {
+		const res = await app.request("/api/datasets", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				seller: "not_an_address",
+				name: "Test",
+				rootHash: "0xhash",
+				price: "10",
+			}),
+		});
+		expect(res.status).toBe(400);
+		const json = await res.json();
+		expect(json.error).toContain("address");
+	});
+
+	test("rejects invalid format", async () => {
+		const res = await app.request("/api/datasets", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				seller: "0xseller",
+				name: "Test",
+				rootHash: "0xhash",
+				price: "10",
+				format: "invalid_format",
+			}),
+		});
+		expect(res.status).toBe(400);
+		const json = await res.json();
+		expect(json.error).toContain("format");
+	});
 });
 
 describe("GET /api/datasets/search", () => {
