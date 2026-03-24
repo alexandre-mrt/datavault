@@ -12,6 +12,11 @@ const app = new Hono();
 app.use("*", cors());
 app.use("*", logger());
 
+app.onError((err, c) => {
+	console.error(`Unhandled error: ${err.message}`);
+	return c.json({ success: false, error: "Internal server error" }, 500);
+});
+
 app.route("/api", apiRouter);
 
 app.get("/", (c) => {
